@@ -47,7 +47,7 @@ defmodule LoggerJSON.Formatters.DatadogLogger do
 
   @impl true
   def format_event(level, msg, ts, md, md_keys, formatter_state) do
-    Map.merge(
+    dd_format = Map.merge(
       %{
         logger:
           json_map(
@@ -61,6 +61,8 @@ defmodule LoggerJSON.Formatters.DatadogLogger do
       },
       format_metadata(md, md_keys)
     )
+    IO.inspect(dd_format)
+    dd_format
   end
 
   defp format_metadata(md, md_keys) do
