@@ -61,8 +61,6 @@ defmodule LoggerJSON.Formatters.DatadogLogger do
       },
       format_metadata(md, md_keys)
     )
-    IO.inspect(dd_format)
-    dd_format
   end
 
   defp format_metadata(md, md_keys) do
