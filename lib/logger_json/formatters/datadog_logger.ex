@@ -47,20 +47,31 @@ defmodule LoggerJSON.Formatters.DatadogLogger do
 
   @impl true
   def format_event(level, msg, ts, md, md_keys, formatter_state) do
-    dd_format = Map.merge(
-      %{
-        logger:
-          json_map(
-            thread_name: inspect(Keyword.get(md, :pid)),
-            method_name: method_name(md),
-            file_name: Keyword.get(md, :file),
-            line: Keyword.get(md, :line)
-          ),
-        message: IO.chardata_to_string(msg),
-        syslog: syslog(level, ts, formatter_state.hostname)
-      },
-      format_metadata(md, md_keys)
-    )
+    # dd_format = Map.merge(
+    #   %{
+    #     logger:
+    #       json_map(
+    #         thread_name: inspect(Keyword.get(md, :pid)),
+    #         method_name: method_name(md),
+    #         file_name: Keyword.get(md, :file),
+    #         line: Keyword.get(md, :line)
+    #       ),
+    #     message: IO.chardata_to_string(msg),
+    #     syslog: syslog(level, ts, formatter_state.hostname)
+    #   },
+    #   format_metadata(md, md_keys)
+    # )
+    {:ok, message} =
+      ~s({
+        "message": "Hi",
+        "level": "info",
+        "syslog": {
+          "hostname": "twozeronine",
+          "timestamp": "2023-01-19T21:04:06.662Z"
+        }
+      })
+      |> Jason.decode()
+      message
   end
 
   defp format_metadata(md, md_keys) do
