@@ -124,7 +124,7 @@ defmodule LoggerJSON.Formatters.DatadogLogger do
     {:ok, hostname} = :inet.gethostname()
 
     json_map(
-      hostname: "twozeronine",
+      hostname: to_string(hostname),
       severity: Atom.to_string(level),
       timestamp: FormatterUtils.format_timestamp(ts)
     )
@@ -139,7 +139,7 @@ defmodule LoggerJSON.Formatters.DatadogLogger do
 
   defp syslog(level, ts, hostname) do
     json_map(
-      hostname: "twozeronine",
+      hostname: hostname,
       severity: Atom.to_string(level),
       timestamp: FormatterUtils.format_timestamp(ts)
     )
