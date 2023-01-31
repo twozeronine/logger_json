@@ -47,24 +47,26 @@ defmodule LoggerJSON.Formatters.DatadogLogger do
 
   @impl true
   def format_event(level, msg, ts, md, md_keys, formatter_state) do
-    dd_format = Map.merge(
-      %{
-        logger:
-          json_map(
-            thread_name: inspect(Keyword.get(md, :pid)),
-            method_name: method_name(md),
-            file_name: Keyword.get(md, :file),
-            line: Keyword.get(md, :line)
-          ),
-        message: IO.chardata_to_string(msg),
-        syslog: syslog(level, ts, formatter_state.hostname)
-      },
-      format_metadata(md, md_keys)
-    )
+    dd_format =
+      Map.merge(
+        %{
+          logger:
+            json_map(
+              thread_name: inspect(Keyword.get(md, :pid)),
+              method_name: method_name(md),
+              file_name: Keyword.get(md, :file),
+              line: Keyword.get(md, :line)
+            ),
+          message: IO.chardata_to_string(msg),
+          syslog: syslog(level, ts, formatter_state.hostname)
+        },
+        format_metadata(md, md_keys)
+      )
   end
 
   defp format_metadata(md, md_keys) do
     IO.inspect("Origin metadata : #{md}")
+
     LoggerJSON.take_metadata(md, md_keys, @processed_metadata_keys)
     |> convert_tracing_keys(md)
     |> JasonSafeFormatter.format()
@@ -73,7 +75,7 @@ defmodule LoggerJSON.Formatters.DatadogLogger do
 
   # To connect logs and traces, span_id and trace_id keys are respectively dd.span_id and dd.trace_id
   # https://docs.datadoghq.com/tracing/faq/why-cant-i-see-my-correlated-logs-in-the-trace-id-panel/?tab=jsonlogs
-  def convert_tracing_keys(output, md) do
+  defp convert_tracing_keys(output, md) do
     # Notice: transformers can override each others but the last one in this list wins
     [
       otel_span_id: {"dd.span_id", &convert_otel_field/1},
@@ -84,6 +86,7 @@ defmodule LoggerJSON.Formatters.DatadogLogger do
     |> Enum.reduce(output, fn {key, {new_key, transformer}}, acc ->
       if Keyword.has_key?(md, key) do
         new_value = transformer.(Keyword.get(md, key))
+        IO.inspect("new key : #{new_key} new value : #{new_value}")
         Map.put(acc, new_key, new_value)
       else
         acc
