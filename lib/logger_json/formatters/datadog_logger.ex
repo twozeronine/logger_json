@@ -62,6 +62,7 @@ defmodule LoggerJSON.Formatters.DatadogLogger do
         },
         format_metadata(md, md_keys)
       )
+      IO.inspect("Meta")
       LoggerJSON.take_metadata(md, md_keys, @processed_metadata_keys)
       |> IO.inspect()
     dd_format
@@ -87,6 +88,7 @@ defmodule LoggerJSON.Formatters.DatadogLogger do
     |> Enum.reduce(output, fn {key, {new_key, transformer}}, acc ->
       if Keyword.has_key?(md, key) do
         new_value = transformer.(Keyword.get(md, key))
+        IO.inspect("old key : #{key}, old value : #{Keyword.get(md, key)}")
         IO.inspect("new key : #{new_key} new value : #{new_value}")
         Map.put(acc, new_key, new_value)
       else
