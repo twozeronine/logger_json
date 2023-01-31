@@ -62,11 +62,12 @@ defmodule LoggerJSON.Formatters.DatadogLogger do
         },
         format_metadata(md, md_keys)
       )
+      LoggerJSON.take_metadata(md, md_keys, @processed_metadata_keys)
+      |> IO.inspect()
+    dd_format
   end
 
   defp format_metadata(md, md_keys) do
-    IO.inspect("Origin metadata : #{md}")
-
     LoggerJSON.take_metadata(md, md_keys, @processed_metadata_keys)
     |> convert_tracing_keys(md)
     |> JasonSafeFormatter.format()
