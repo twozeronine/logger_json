@@ -72,7 +72,7 @@ defmodule LoggerJSON.Formatters.DatadogLogger do
 
   # To connect logs and traces, span_id and trace_id keys are respectively dd.span_id and dd.trace_id
   # https://docs.datadoghq.com/tracing/faq/why-cant-i-see-my-correlated-logs-in-the-trace-id-panel/?tab=jsonlogs
-  defp convert_tracing_keys(output, md) do
+  def convert_tracing_keys(output, md) do
     # Notice: transformers can override each others but the last one in this list wins
     [
       otel_span_id: {"dd.span_id", &convert_otel_field/1},
@@ -83,6 +83,7 @@ defmodule LoggerJSON.Formatters.DatadogLogger do
     |> Enum.reduce(output, fn {key, {new_key, transformer}}, acc ->
       if Keyword.has_key?(md, key) do
         new_value = transformer.(Keyword.get(md, key))
+        IO.inspect("key : #{key} new_value : #{new_value}")
         Map.put(acc, new_key, new_value)
       else
         acc
@@ -95,16 +96,16 @@ defmodule LoggerJSON.Formatters.DatadogLogger do
   # https://docs.datadoghq.com/tracing/other_telemetry/connect_logs_and_traces/opentelemetry/?tab=go
   # Tests were stolen from https://github.com/open-telemetry/opentelemetry-specification/issues/525
   # and https://go.dev/play/p/pUBHcLdXJNy
-  defp convert_otel_field(<<value::binary-size(16)>>) do
+  def convert_otel_field(<<value::binary-size(16)>>) do
     {value, _} = Integer.parse(value, 16)
     Integer.to_string(value, 10)
   rescue
     _ -> ""
   end
 
-  defp convert_otel_field(value) when byte_size(value) < 16, do: ""
+  def convert_otel_field(value) when byte_size(value) < 16, do: ""
 
-  defp convert_otel_field(value) do
+  def convert_otel_field(value) do
     value = to_string(value)
     len = byte_size(value) - 16
     <<_front::binary-size(len), value::binary>> = value
@@ -113,7 +114,7 @@ defmodule LoggerJSON.Formatters.DatadogLogger do
     _ -> ""
   end
 
-  defp method_name(metadata) do
+  def method_name(metadata) do
     function = Keyword.get(metadata, :function)
     module = Keyword.get(metadata, :module)
 
