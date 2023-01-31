@@ -100,16 +100,16 @@ defmodule LoggerJSON.Formatters.DatadogLogger do
   # https://docs.datadoghq.com/tracing/other_telemetry/connect_logs_and_traces/opentelemetry/?tab=go
   # Tests were stolen from https://github.com/open-telemetry/opentelemetry-specification/issues/525
   # and https://go.dev/play/p/pUBHcLdXJNy
-  def convert_otel_field(<<value::binary-size(16)>>) do
+  defp convert_otel_field(<<value::binary-size(16)>>) do
     {value, _} = Integer.parse(value, 16)
     Integer.to_string(value, 10)
   rescue
     _ -> ""
   end
 
-  def convert_otel_field(value) when byte_size(value) < 16, do: ""
+  defp convert_otel_field(value) when byte_size(value) < 16, do: ""
 
-  def convert_otel_field(value) do
+  defp convert_otel_field(value) do
     value = to_string(value)
     len = byte_size(value) - 16
     <<_front::binary-size(len), value::binary>> = value
@@ -118,7 +118,7 @@ defmodule LoggerJSON.Formatters.DatadogLogger do
     _ -> ""
   end
 
-  def method_name(metadata) do
+  defp method_name(metadata) do
     function = Keyword.get(metadata, :function)
     module = Keyword.get(metadata, :module)
 
