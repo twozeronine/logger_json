@@ -75,7 +75,7 @@ defmodule LoggerJSON.Formatters.DatadogLogger do
   # https://docs.datadoghq.com/tracing/faq/why-cant-i-see-my-correlated-logs-in-the-trace-id-panel/?tab=jsonlogs
   def convert_tracing_keys(output, md) do
     # Notice: transformers can override each others but the last one in this list wins
-    new_map = [
+    [
       otel_span_id: {"dd.span_id", &convert_otel_field/1},
       otel_trace_id: {"dd.trace_id", &convert_otel_field/1},
       span_id: {"dd.span_id", & &1},
@@ -89,10 +89,6 @@ defmodule LoggerJSON.Formatters.DatadogLogger do
         acc
       end
     end)
-    IO.inspect("output #{output}")
-    IO.inspect("md #{md}")
-    IO.inspect("new map : #{new_map}")
-    new_map
   end
 
   # This converts native OpenTelemetry fields to the native Datadog format.
